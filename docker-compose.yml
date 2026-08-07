@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: gitx-db
+    environment:
+      POSTGRES_USER: gitx
+      POSTGRES_PASSWORD: gitx
+      POSTGRES_DB: gitx
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gitx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: gitx-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Backend API service (to be implemented by gitx-api agent)
+  # Uncomment after the backend is ready:
+  # api:
+  #   build: ./src/backend
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #     - redis
+
+volumes:
+  postgres_data:
+  redis_data:
